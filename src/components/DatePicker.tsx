@@ -17,7 +17,7 @@ function DatePickerdatePicker({className, error, errorMessage, ...props}: datePi
 
 	return (
 		<div className="flex w-full flex-col">
-			<_DatePicker locale="pt-BR" wrapperClassName="w-full" className={datePickerClassName} enableTabLoop={false} {...props} />
+			<_DatePicker dateFormat="dd/MM/yyyy" locale="pt" wrapperClassName="w-full" className={datePickerClassName} enableTabLoop={false} {...props} />
 			{error && errorMessage && <div className="mt-1 text-xs text-red-500">{errorMessage}</div>}
 		</div>
 	);

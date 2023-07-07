@@ -3,8 +3,7 @@
 import Button from '@/components/Button';
 import DatePicker from '@/components/DatePicker';
 import Input from '@/components/Input';
-import {Trip} from '@prisma/client';
-import {error} from 'console';
+
 import {differenceInDays} from 'date-fns';
 import {Controller, useForm} from 'react-hook-form';
 
@@ -29,6 +28,7 @@ export function TripReservation({tripId, tripEndDate, tripStartDate, maxGuests, 
 		formState: {errors},
 		control,
 		watch,
+		setError,
 	} = useForm<TripReservationForm>();
 
 	const startDate = watch('startDate');
@@ -47,6 +47,31 @@ export function TripReservation({tripId, tripEndDate, tripStartDate, maxGuests, 
 		});
 
 		const res = await response.json();
+		if (res?.error?.code === 'TRIP_ALREADY_RESERVED') {
+			setError('startDate', {
+				type: 'manual',
+				message: 'Esta data já está reservada.',
+			});
+
+			return setError('endDate', {
+				type: 'manual',
+				message: 'Esta data já está reservada.',
+			});
+		}
+
+		if (res?.error?.code === 'INVALID_START_DATE') {
+			return setError('startDate', {
+				type: 'manual',
+				message: 'Data inválida.',
+			});
+		}
+
+		if (res?.error?.code === 'INVALID_END_DATE') {
+			return setError('endDate', {
+				type: 'manual',
+				message: 'Data inválida.',
+			});
+		}
 		console.log(res);
 	};
 	return (
@@ -83,12 +108,17 @@ export function TripReservation({tripId, tripEndDate, tripStartDate, maxGuests, 
 							value: true,
 							message: 'Número de hóspedes é obrigatório.',
 						},
+						max: {
+							value: maxGuests,
+							message: `Número de hóspedes não pode ser maior que ${maxGuests}`,
+						},
 					})}
 					placeholder={`Número de hóspedes (máx: ${maxGuests})`}
 					className="mt-4"
 					error={!!errors?.guests}
 					errorMessage={errors?.guests?.message}
 					max={maxGuests}
+					type="number"
 				/>
 
 				<div className="flex justify-between mt-3">
