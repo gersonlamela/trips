@@ -9,6 +9,7 @@ import {differenceInDays} from 'date-fns';
 import {Controller, useForm} from 'react-hook-form';
 
 interface TripReservationProps {
+	tripId: string;
 	tripStartDate: Date;
 	tripEndDate: Date;
 	maxGuests: number;
@@ -21,7 +22,7 @@ interface TripReservationForm {
 	endDate: Date | null;
 }
 
-export function TripReservation({tripEndDate, tripStartDate, maxGuests, pricePerDay}: TripReservationProps) {
+export function TripReservation({tripId, tripEndDate, tripStartDate, maxGuests, pricePerDay}: TripReservationProps) {
 	const {
 		register,
 		handleSubmit,
@@ -33,8 +34,20 @@ export function TripReservation({tripEndDate, tripStartDate, maxGuests, pricePer
 	const startDate = watch('startDate');
 	const endDate = watch('endDate');
 
-	const onSubmit = (data: any) => {
-		console.log({data});
+	const onSubmit = async (data: TripReservationForm) => {
+		const response = await fetch(`http://localhost:3000/api/trips/check`, {
+			method: 'POST',
+			body: Buffer.from(
+				JSON.stringify({
+					startDate: data.startDate,
+					endDate: data.endDate,
+					tripId,
+				})
+			),
+		});
+
+		const res = await response.json();
+		console.log(res);
 	};
 	return (
 		<div>
@@ -75,6 +88,7 @@ export function TripReservation({tripEndDate, tripStartDate, maxGuests, pricePer
 					className="mt-4"
 					error={!!errors?.guests}
 					errorMessage={errors?.guests?.message}
+					max={maxGuests}
 				/>
 
 				<div className="flex justify-between mt-3">
