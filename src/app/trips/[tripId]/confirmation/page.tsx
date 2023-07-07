@@ -31,18 +31,22 @@ export default function TripConfirmation({params}: {params: {tripId: string}}) {
 				}),
 			});
 
-			const {trip, totalPrice} = await response.json();
+			const res = await response.json();
 
-			setTotalPrice(totalPrice);
+			if (res?.error) {
+				return router.push('/');
+			}
 
-			setTrip(trip);
+			setTotalPrice(res.totalPrice);
+
+			setTrip(res.trip);
 		};
 
 		if (status === 'unauthenticated') {
 			signIn();
 		}
 		fetchTrip();
-	}, [status]);
+	}, [status, searchParams, params, router]);
 
 	if (!trip) return null;
 
