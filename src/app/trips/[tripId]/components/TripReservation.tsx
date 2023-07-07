@@ -8,7 +8,9 @@ import {error} from 'console';
 import {Controller, useForm} from 'react-hook-form';
 
 interface TripReservationProps {
-	trip: Trip;
+	tripStartDate: Date;
+	tripEndDate: Date;
+	maxGuests: number;
 }
 
 interface TripReservationForm {
@@ -17,13 +19,16 @@ interface TripReservationForm {
 	endDate: Date | null;
 }
 
-export function TripReservation({trip}: TripReservationProps) {
+export function TripReservation({tripEndDate, tripStartDate, maxGuests}: TripReservationProps) {
 	const {
 		register,
 		handleSubmit,
 		formState: {errors},
 		control,
+		watch,
 	} = useForm<TripReservationForm>();
+
+	const startDate = watch('startDate');
 
 	const onSubmit = (data: any) => {
 		console.log({data});
@@ -41,7 +46,7 @@ export function TripReservation({trip}: TripReservationProps) {
 							},
 						}}
 						control={control}
-						render={({field}) => <DatePicker error={!!errors?.startDate} errorMessage={errors?.startDate?.message} placeholderText="Data de Início" onChange={field.onChange} selected={field.value} className="w-full" />}
+						render={({field}) => <DatePicker error={!!errors?.startDate} errorMessage={errors?.startDate?.message} placeholderText="Data de Início" onChange={field.onChange} selected={field.value} className="w-full" minDate={tripStartDate} />}
 					/>
 					<Controller
 						name="endDate"
@@ -52,7 +57,7 @@ export function TripReservation({trip}: TripReservationProps) {
 							},
 						}}
 						control={control}
-						render={({field}) => <DatePicker error={!!errors?.endDate} errorMessage={errors?.endDate?.message} placeholderText="Data Final" onChange={field.onChange} selected={field.value} className="w-full" />}
+						render={({field}) => <DatePicker error={!!errors?.endDate} errorMessage={errors?.endDate?.message} placeholderText="Data Final" onChange={field.onChange} selected={field.value} className="w-full" maxDate={tripEndDate} minDate={startDate ?? tripStartDate} />}
 					/>
 				</div>
 
@@ -63,7 +68,7 @@ export function TripReservation({trip}: TripReservationProps) {
 							message: 'Número de hóspedes é obrigatório.',
 						},
 					})}
-					placeholder={`Número de hóspedes (máx: ${trip.maxGuests})`}
+					placeholder={`Número de hóspedes (máx: ${maxGuests})`}
 					className="mt-4"
 					error={!!errors?.guests}
 					errorMessage={errors?.guests?.message}
